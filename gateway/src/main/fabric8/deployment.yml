@@ -12,7 +12,7 @@ metadata:
   labels:
     app: gateway
     provider: fabric8
-    version: 1.0-SNAPSHOT
+    version: 0.1
     group: com.hybris.openplatform
   name: gateway-cloudcart
 spec:
@@ -40,7 +40,7 @@ spec:
       labels:
         app: gateway
         provider: fabric8
-        version: 1.0-SNAPSHOT
+        version: 0.1
         group: com.hybris.openplatform
     spec:
       containers:
