@@ -1,0 +1,35 @@
+vertx:
+  microservice:
+    name: openplatform-api-gateway
+  deployment:
+    worker: false
+    instances: 16
+  http:
+    port: 8085
+  eventbus:
+    cluster:
+      config:
+        kubernates:
+          custom:
+            sources:
+              - vertx-eventbus-kubernetes-gateway.xml
+---
+spring:
+  datasource:
+    url: jdbc:mysql://localhost/hybris_dev?useConfigs=maxPerformance
+    username: hybris
+    password: hybris
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+---
+storage:
+    registrations:
+      name: registrations
+      enabled: true
+      write-batch-size: 10
+      write-delay-seconds: 5
+---
