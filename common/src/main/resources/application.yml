@@ -1,0 +1,31 @@
+server:
+  port: 0
+
+endpoints:
+  shutdown:
+    enabled: true
+
+vertx:
+  eventbus:
+    cluster:
+      config:
+        default: vertx-eventbus-cluster.xml
+        kubernates: vertx-eventbus-kubernetes-cluster.xml
+  circuitbreaker:
+    config:
+      basic:
+        maxfailures: 2
+        timeout: 2000
+        resettimeout: 2000
+
+
+
+runtime:
+  context:
+    tenant: master
+
+datagrid:
+  hazelcast:
+    configuration:
+      default: openplatform-datagrid-cluster.xml
+      kubernates: openplatform-datagrid-kubernetes-cluster.xml

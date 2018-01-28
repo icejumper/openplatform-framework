@@ -1,0 +1,16 @@
+/*/classes/
+/*/webapp/WEB-INF/classes/
+/*/resources/beans.xsd
+/*/resources/items.xsd
+/*/lib/
+/*/webapp/WEB-INF/lib/
+/target/*
+/*/target/*
+*.orig
+.idea
+.idea/*
+.idea/.name
+/*/.idea
+/*/*.iml
+/*/*.settings/*
+*.build.number
