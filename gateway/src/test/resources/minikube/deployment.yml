@@ -8,19 +8,19 @@ metadata:
     fabric8.io/git-branch: master
     fabric8.io/metrics-path: dashboard/file/kubernetes-pods.json/?var-project=gateway&var-version=1.0-SNAPSHOT
     fabric8.io/scm-tag: HEAD
-    fabric8.io/scm-url: https://github.com/spring-projects/spring-boot/spring-boot-starter-parent/common-framework/gateway
+    fabric8.io/scm-url: https://github.com/spring-projects/spring-boot/spring-boot-starter-parent/zeppelins-common-framework/zeppelins-gateway
   labels:
-    app: gateway
+    app: zeppelins-gateway
     provider: fabric8
-    version: 1.0-SNAPSHOT
+    version: 0.1
     group: com.hybris.openplatform
-  name: gateway-cloudcart
+  name: zeppelins-gateway
 spec:
   replicas: 1
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: gateway
+      app: zeppelins-gateway
       provider: fabric8
       group: com.hybris.openplatform
   strategy:
@@ -38,9 +38,9 @@ spec:
         fabric8.io/git-branch: master
         fabric8.io/scm-tag: HEAD
       labels:
-        app: gateway
+        app: zeppelins-gateway
         provider: fabric8
-        version: 1.0-SNAPSHOT
+        version: 0.1
         group: com.hybris.openplatform
     spec:
       containers:
@@ -49,9 +49,9 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: openplatform-gateway:1.0.0
+        image: zeppelins-gateway:0.1.0
         imagePullPolicy: Always
-        name: openplatform-gateway
+        name: zeppelins-gateway
         ports:
         - containerPort: 8085
           protocol: TCP

@@ -32,8 +32,8 @@ spec:
     metadata:
       annotations:
         fabric8.io/git-commit: 810f1e91a4aaa47c807cbb173db189b6c6857a79
-        fabric8.io/metrics-path: dashboard/file/kubernetes-pods.json/?var-project=gateway&var-version=1.0-SNAPSHOT
-        fabric8.io/scm-url: https://github.com/spring-projects/spring-boot/spring-boot-starter-parent/common-framework/gateway
+        fabric8.io/metrics-path: dashboard/file/kubernetes-pods.json/?var-project=zeppelins-gateway&var-version=1.0-SNAPSHOT
+        fabric8.io/scm-url: https://github.com/spring-projects/spring-boot/spring-boot-starter-parent/zeppelins-common-framework/zeppelins-gateway
         fabric8.io/iconUrl: img/icons/spring-boot.svg
         fabric8.io/git-branch: master
         fabric8.io/scm-tag: HEAD
@@ -57,5 +57,5 @@ spec:
           protocol: TCP
         securityContext:
           privileged: false
-        imagePullSecrets:
-          - name: mysecrets
+#        imagePullSecrets:
+#          - name: mysecrets
