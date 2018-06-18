@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hybris.openplatform</groupId>
-	<artifactId>common-framework</artifactId>
+	<artifactId>zeppelins-common-framework</artifactId>
 	<packaging>pom</packaging>
 	<version>0.1</version>
 	
@@ -18,14 +18,16 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.3.8.RELEASE</version>
+		<version>2.0.0.RELEASE</version>
 	</parent>
 
 	<properties>
-		<vertx.version>3.4.2</vertx.version>
+		<vertx.version>3.5.1</vertx.version>
 		<hazelcast.version>3.8.2</hazelcast.version>
-		<spring.version>4.3.7.RELEASE</spring.version>
+		<spring.version>5.0.4.RELEASE</spring.version>
+		<jackson.version>2.9.4</jackson.version>
 		<fabric8.version>3.5.33</fabric8.version>
+		<org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
 		<main.verticle/>
 	</properties>
 
@@ -82,8 +84,55 @@
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
 				</plugin>
+				<plugin>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.0.2</version>
+					<executions>
+						<execution>
+							<id>copy</id>
+							<phase>package</phase>
+							<goals>
+								<goal>copy</goal>
+								<goal>copy-dependencies</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<artifactItems>
+							<artifactItem>
+								<groupId>com.hybris.openplatform</groupId>
+								<artifactId>zeppelins-common</artifactId>
+								<version>0.1</version>
+								<type>jar</type>
+								<overWrite>false</overWrite>
+								<outputDirectory>${project.build.directory}/mutablelibs</outputDirectory>
+							</artifactItem>
+							<artifactItem>
+								<groupId>com.hybris.openplatform</groupId>
+								<artifactId>zeppelins-bootstrap</artifactId>
+								<version>0.1</version>
+								<type>jar</type>
+								<overWrite>false</overWrite>
+								<outputDirectory>${project.build.directory}/mutablelibs</outputDirectory>
+							</artifactItem>
+						</artifactItems>
+						<excludeArtifactIds>zeppelins-common,zeppelins-bootstrap</excludeArtifactIds>
+						<outputDirectory>${project.build.directory}/libs</outputDirectory>
+						<overWriteReleases>false</overWriteReleases>
+						<overWriteSnapshots>false</overWriteSnapshots>
+						<overWriteIfNewer>true</overWriteIfNewer>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 	<dependencies>
@@ -115,7 +164,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>18.0</version>
+			<version>21.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
@@ -144,15 +193,36 @@
 			<artifactId>vertx-hazelcast</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>${org.mapstruct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-jdk8</artifactId>
+			<version>${org.mapstruct.version}</version>
+		</dependency>
+		<!-- TEST -->
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.19</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>

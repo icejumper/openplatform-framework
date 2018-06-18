@@ -1,5 +1,7 @@
 package com.hybris.openplatform.common.application.config.hazelcast;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 import com.hybris.openplatform.common.context.SpringProfileDiscovery;
 
 import java.util.List;
@@ -11,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.hazelcast.config.Config;
@@ -68,7 +69,7 @@ public class HazelcastConfigProvider
 				.append("\"/>");
 
 		final List<String> appConfigXmls = customHazelcastConfig.getSources();
-		if (!CollectionUtils.isEmpty(appConfigXmls))
+		if (isNotEmpty(appConfigXmls))
 		{
 			for (String appConfigXml : appConfigXmls)
 			{
@@ -83,7 +84,7 @@ public class HazelcastConfigProvider
 		if(springProfileDiscovery.isProfileKubernates())
 		{
 			final List<String> appKubernetesConfigXmls = customHazelcastKubernetesConfig.getSources();
-			if (!CollectionUtils.isEmpty(appKubernetesConfigXmls))
+			if (isNotEmpty(appKubernetesConfigXmls))
 			{
 				for (String appKubernetesConfigXml : appKubernetesConfigXmls)
 				{
@@ -127,7 +128,7 @@ public class HazelcastConfigProvider
 		if(springProfileDiscovery.isProfileKubernates())
 		{
 			final List<String> appConfigXmls = customEventbusHazelcastConfig.getSources();
-			if (!CollectionUtils.isEmpty(appConfigXmls))
+			if (isNotEmpty(appConfigXmls))
 			{
 				for (String appConfigXml : appConfigXmls)
 				{
@@ -138,10 +139,6 @@ public class HazelcastConfigProvider
 							.append(appConfigXml)
 							.append("\"/>");
 				}
-			}
-			else
-			{
-				return "";
 			}
 		}
 

@@ -3,8 +3,10 @@ package com.hybris.openplatform.common.framework;
 import com.hybris.openplatform.stereotypes.MicroserviceApplication;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.env.YamlPropertySourceLoader;
@@ -21,37 +23,56 @@ public class CommonsEnvironmentPostProcessor implements EnvironmentPostProcessor
 	public void postProcessEnvironment(final ConfigurableEnvironment configurableEnvironment,
 			final SpringApplication springApplication)
 	{
-		final MicroserviceApplication microserviceApplicationAnn = springApplication.getMainApplicationClass()
-				.getAnnotation(MicroserviceApplication.class);
+		final ConfigurableEnvironment parent = new CommonsConfigurableEnvironment();
+		final MutablePropertySources propertySources = parent.getPropertySources();
 
-		if (Objects.nonNull(microserviceApplicationAnn) && !StringUtils.isEmpty(microserviceApplicationAnn.profile()))
+		final List<PropertySource<?>> loadCommonsFrameworkList = tryLoadingYamlPropertySource("commonsFramework", "yml", "yaml");
+		final PropertySource<?> loadCommonsFramework;
+		if (CollectionUtils.isNotEmpty(loadCommonsFrameworkList))
 		{
-			final String profile = microserviceApplicationAnn.profile();
-
-			final ConfigurableEnvironment parent = new CommonsConfigurableEnvironment();
-			final MutablePropertySources propertySources = parent.getPropertySources();
-
-			final PropertySource<?> load = tryLoadingYamlPropertySource(profile, "yml", "yaml");
-			if(Objects.nonNull(load))
+			if (loadCommonsFrameworkList.size() == 1)
 			{
-				propertySources.addLast(load);
-				configurableEnvironment.merge(parent);
+				loadCommonsFramework = loadCommonsFrameworkList.get(0);
+				propertySources.addLast(loadCommonsFramework);
+			}
+			else
+			{
+				throw new RuntimeException("Found more than one property configuration for commons framework: not supported");
 			}
 		}
+		else
+		{
+			loadCommonsFramework = null;
+		}
+
+		String profile = null;
+		final MicroserviceApplication microserviceApplicationAnn = springApplication.getMainApplicationClass()
+				.getAnnotation(MicroserviceApplication.class);
+		if (Objects.nonNull(microserviceApplicationAnn) && !StringUtils.isEmpty(microserviceApplicationAnn.profile()))
+		{
+			profile = microserviceApplicationAnn.profile();
+
+			final List<PropertySource<?>> loadAppPropertiesSources = tryLoadingYamlPropertySource(profile, "yml", "yaml");
+			if (Objects.nonNull(loadCommonsFramework) && CollectionUtils.isNotEmpty(loadAppPropertiesSources))
+			{
+				loadAppPropertiesSources.forEach(s -> propertySources.addBefore(loadCommonsFramework.getName(), s));
+			}
+		}
+		configurableEnvironment.merge(parent);
 	}
 
-	private PropertySource<?> tryLoadingYamlPropertySource(final String profile, final String... extensions)
+	private List<PropertySource<?>> tryLoadingYamlPropertySource(final String profile, final String... extensions)
 	{
 		final YamlPropertySourceLoader yamlPropertySourceLoader = new YamlPropertySourceLoader();
 		Exception lastException = null;
-		PropertySource<?> propertySource = null;
+		List<PropertySource<?>> propertySource = null;
 		for (String ext : extensions)
 		{
 			try
 			{
-				final String resourcePath = "application-" + profile + "." + ext;
+				final String resourcePath = "/application-" + profile + "." + ext;
 				propertySource = yamlPropertySourceLoader
-						.load("classpath:/" + resourcePath, new ClassPathResource(resourcePath), null);
+						.load("classpath:" + resourcePath, new ClassPathResource(resourcePath));
 				return propertySource;
 			}
 			catch (RuntimeException | IOException e)

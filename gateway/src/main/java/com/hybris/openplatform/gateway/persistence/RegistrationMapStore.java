@@ -25,9 +25,13 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Maps;
 import com.hazelcast.core.MapStore;
 
-
 /**
  * Hazlecast MapStrore implementation for Cart
+ */
+
+
+/**
+ * Hazlecast MapStrore implementation
  */
 @Component
 @Profile("persist")
@@ -76,7 +80,7 @@ public class RegistrationMapStore implements MapStore<String, RestEndpointRegist
 		final Iterable<RestEndpointRegistration> registrationsToSave = registrationMap.entrySet().stream().map(Map.Entry::getValue)
 				.collect(toSet());
 		LOGGER.info("Store registrations (storeAll): {}", registrationsToSave);
-		registrationRepository.save(registrationsToSave);
+		registrationRepository.saveAll(registrationsToSave);
 	}
 
 
@@ -98,7 +102,7 @@ public class RegistrationMapStore implements MapStore<String, RestEndpointRegist
 		LOGGER.info("Deleting ALL registrations (deleteAll): {}", allRegistrations);
 		if (nonNull(allRegistrations) && allRegistrations.iterator().hasNext())
 		{
-			registrationRepository.delete(allRegistrations);
+			registrationRepository.deleteAll(allRegistrations);
 		}
 	}
 

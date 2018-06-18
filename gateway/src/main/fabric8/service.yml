@@ -7,21 +7,21 @@ metadata:
     fabric8.io/iconUrl: img/icons/spring-boot.svg
     fabric8.io/git-branch: master
     fabric8.io/scm-tag: HEAD
-    fabric8.io/scm-url: https://github.com/spring-projects/spring-boot/spring-boot-starter-parent/common-framework/gateway
+    fabric8.io/scm-url: https://github.com/spring-projects/spring-boot/spring-boot-starter-parent/zeppelins-common-framework/zeppelins-gateway
     service.beta.kubernetes.io/azure-load-balancer-internal: "false"
   labels:
-    app: gateway
+    app: zeppelins-gateway
     provider: fabric8
     version: 1.0-SNAPSHOT
     group: com.hybris.openplatform
-  name: gateway-service
+  name: zeppelins-gateway-service
 spec:
   ports:
   - port: 8085
     protocol: TCP
     targetPort: 8085
   selector:
-    app: gateway
+    app: zeppelins-gateway
     provider: fabric8
     group: com.hybris.openplatform
   type: LoadBalancer

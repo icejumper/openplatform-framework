@@ -1,5 +1,6 @@
 package com.hybris.openplatform.bootstrap.messages;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = "pattern")
 @AllArgsConstructor
 @NoArgsConstructor
-public class RestEndpointRegistration
+public class RestEndpointRegistration implements Serializable
 {
 	@Id
 	private String pattern;

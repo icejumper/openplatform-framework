@@ -66,7 +66,8 @@ public abstract class AbstractOpenPlatformMicroservices
 		final GroupConfig groupConfig = new GroupConfig("clusterGroup_" + serviceName(), "");
 		config.setGroupConfig(groupConfig);
 
-		config.getNetworkConfig().setReuseAddress(true).setPort(6801).setPortAutoIncrement(true).setPortCount(100);
+		final int initPort = getEnvironment().getProperty("datagrid.hazelcast.configuration.default.port", Integer.class, 6801);
+		config.getNetworkConfig().setReuseAddress(true).setPort(initPort).setPortAutoIncrement(true).setPortCount(100);
 
 		return Hazelcast.newHazelcastInstance(config);
 	}
@@ -87,11 +88,27 @@ public abstract class AbstractOpenPlatformMicroservices
 	@EventListener
 	void deployVerticles(ApplicationReadyEvent event)
 	{
+		if(Objects.isNull(vertx))
+		{
+			LOG.error("The Vert.X system was not initialized! Aborting verticles deployment");
+			return;
+		}
 		vertx.getDelegate().registerVerticleFactory(verticleFactory);
 		final DeploymentOptions deploymentOptions = new DeploymentOptions()
 				.setWorker(true)
 				.setInstances(1);
-		vertx.getDelegate().deployVerticle(mainMicroServiceRxVerticle, deploymentOptions);
+		LOG.info("Deploying MainMicroserviceVerticle...");
+		vertx.getDelegate().deployVerticle(mainMicroServiceRxVerticle, deploymentOptions, event1 -> {
+			if(event1.succeeded())
+			{
+				LOG.info("MainMicroserviceVerticle deployed");
+			}
+			else
+			{
+				LOG.error("Error while deploying MainMicroserviceVerticle: {}", event1.cause());
+			}
+		});
+
 	}
 
 	protected Environment getEnvironment()
@@ -109,12 +126,6 @@ public abstract class AbstractOpenPlatformMicroservices
 	public void setVerticleFactory(final SpringVerticleFactory verticleFactory)
 	{
 		this.verticleFactory = verticleFactory;
-	}
-
-	@Resource
-	public void setVertx(final Vertx vertx)
-	{
-		this.vertx = vertx;
 	}
 
 	@Resource
@@ -136,4 +147,10 @@ public abstract class AbstractOpenPlatformMicroservices
 	}
 
 	protected abstract String serviceName();
+
+	@Resource
+	public void setVertx(final Vertx vertx)
+	{
+		this.vertx = vertx;
+	}
 }

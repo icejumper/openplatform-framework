@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -22,6 +24,8 @@ import com.hazelcast.spi.properties.GroupProperty;
 @ComponentScan({ "com.hybris.openplatform.common" })
 public class HazelcastInitialisationProvider
 {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HazelcastInitialisationProvider.class);
 
 	private TenantContext tenantContext;
 	private HazelcastConfigProvider hazelcastConfigProvider;
@@ -53,6 +57,7 @@ public class HazelcastInitialisationProvider
 		}
 		else
 		{
+			LOGGER.error("Event bus hazelcast instance was not initialized properly: returning NULL");
 			return null;
 		}
 	}

@@ -1,5 +1,7 @@
 server:
   port: 0
+  ssl_enabled: false
+  certificate_path: /opt/security/openplatform_trusted.jks
 
 endpoints:
   shutdown:
@@ -17,9 +19,6 @@ vertx:
         maxfailures: 2
         timeout: 2000
         resettimeout: 2000
-
-
-
 runtime:
   context:
     tenant: master

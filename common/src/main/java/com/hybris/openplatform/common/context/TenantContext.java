@@ -1,8 +1,8 @@
 package com.hybris.openplatform.common.context;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 public class TenantContext
 {
 	private String name;
-	@Autowired
 	private Environment env;
 
 	public String getName()
@@ -23,5 +22,11 @@ public class TenantContext
 	private void afterPropertiesSet()
 	{
 		name = env.getProperty("runtime.context.tenant", "master");
+	}
+
+	@Resource
+	public void setEnv(final Environment env)
+	{
+		this.env = env;
 	}
 }

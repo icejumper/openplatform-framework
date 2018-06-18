@@ -9,8 +9,5 @@ public interface BallancingStrategy
 
 	RestEndpointRegistration getNextRegisteredNode(String method, String pattern);
 
-	default String getRegistrationEntryKey(String method, String pattern)
-	{
-		return method + "@" + pattern;
-	}
 }
+
