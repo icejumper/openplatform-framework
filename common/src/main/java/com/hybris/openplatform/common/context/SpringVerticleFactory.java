@@ -1,6 +1,7 @@
 package com.hybris.openplatform.common.context;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -12,12 +13,11 @@ import io.vertx.core.spi.VerticleFactory;
 public class SpringVerticleFactory implements VerticleFactory
 {
 
-  @Autowired
   private ApplicationContext applicationContext;
 
   @Override
   public boolean blockingCreate() {
-	  // Usually verticle instantiation is fast but since our verticles are Spring Beans,
+    // Usually verticle instantiation is fast but since our verticles are Spring Beans,
     // they might depend on other beans/resources which are slow to build/lookup.
     return true;
   }
@@ -34,5 +34,10 @@ public class SpringVerticleFactory implements VerticleFactory
     String clazz = VerticleFactory.removePrefix(verticleName);
     return (Verticle) applicationContext.getBean(Class.forName(clazz));
   }
-  
+
+  @Resource
+  public void setApplicationContext(final ApplicationContext applicationContext)
+  {
+    this.applicationContext = applicationContext;
+  }
 }

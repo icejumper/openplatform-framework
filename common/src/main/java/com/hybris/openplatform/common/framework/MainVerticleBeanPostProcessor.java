@@ -83,26 +83,34 @@ public class MainVerticleBeanPostProcessor implements BeanPostProcessor
 	@Override
 	public Object postProcessAfterInitialization(final Object bean, final String beanName)
 	{
-		if (bean.equals(verticleDeploymentService) && verticleDeploymentService instanceof VerticleDeployer)
+		try
 		{
-			return Proxy.newProxyInstance(bean.getClass().getClassLoader(), ClassUtils.getAllInterfaces(bean),
-					(proxy, method, args) -> {
-						if (INVOKE_DEPLOY_SUB_VERTICLES.equals(method.getName()))
-						{
-							internalDeployVerticles();
-						}
-						return ReflectionUtils.invokeMethod(method, bean, args);
-					});
+			if (bean instanceof VerticleDeployer && verticleDeploymentService instanceof VerticleDeployer && bean.equals(verticleDeploymentService))
+			{
+				return Proxy.newProxyInstance(bean.getClass().getClassLoader(), ClassUtils.getAllInterfaces(bean),
+						(proxy, method, args) -> {
+							if (INVOKE_DEPLOY_SUB_VERTICLES.equals(method.getName()))
+							{
+								internalDeployVerticles();
+							}
+							return ReflectionUtils.invokeMethod(method, bean, args);
+						});
+			}
+		}
+		catch (final Exception e)
+		{
+			LOG.warn("Failed processing the bean [{}]: {}", beanName, e);
 		}
 		return bean;
 	}
 
 	private void internalDeployVerticles()
 	{
+		LOG.info("Deploying sub-verticles....");
 		final Vertx vertx = ((Verticle) mainVerticle).getVertx();
 		if (!CollectionUtils.isEmpty(subVerticles))
 		{
-			LOG.info("Deploying sub-verticles....");
+			LOG.info("Deploying {} sub-verticles....", subVerticles.size());
 		}
 		for (Map.Entry<Verticle, VerticleComponent> subVerticleEntry : subVerticles.entrySet())
 		{

@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface GatewayService
 {
-	
+
 	Optional<RestEndpointRegistration> getRegistration(final String pattern);
 
 	List<RestEndpointRegistration> getRegistrations();

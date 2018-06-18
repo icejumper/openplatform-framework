@@ -58,6 +58,7 @@ public class GatewayVerticle extends MicroServiceVerticle
 				registration.setOriginatorAddress(originatorAddress);
 				final String method = registration.getMethod();
 				final String pattern = registration.getPattern();
+				LOGGER.info("Registering REST endpoint {}", registrationMessage);
 				switch (method)
 				{
 					case "GET":
@@ -113,8 +114,9 @@ public class GatewayVerticle extends MicroServiceVerticle
 					deliveryOptions.addHeader(Constants.MESSAGE_PATH_PARAMS_HEADER, Json.encode(pathParams));
 				}
 				LOGGER.debug("Forwarding POST request to eventBus address [{}]", restEndpointRegistration.getServiceAddress());
-				rxSendMessage(restEndpointRegistration.getServiceAddress(), rc.getBodyAsString(Constants.DEFAULT_ENCODING),
-						deliveryOptions)
+				LOGGER.info("Processing original payload: {}", rc.getBodyAsString());
+				final String bodyAsString = cleanUpCSRFToken(rc.getBodyAsString());
+				rxSendMessage(restEndpointRegistration.getServiceAddress(), bodyAsString, deliveryOptions)
 						.doOnSuccess(responseMessage -> routeRequestReplySuccess(rc, responseMessage))
 						.doOnError(error -> routeRequestReplyError(rc, error))
 						.subscribe();
@@ -125,6 +127,20 @@ public class GatewayVerticle extends MicroServiceVerticle
 						.end("Missing required headers in the request: " + requiredHeaders);
 			}
 		};
+	}
+
+	private String cleanUpCSRFToken(final String payload)
+	{
+		if(Objects.nonNull(payload) && payload.contains("&CSRFToken="))
+		{
+			String cleanPayload = payload.substring(0, payload.indexOf("&CSRFToken="));
+			if(StringUtils.isEmpty(cleanPayload))
+			{
+				cleanPayload = "{}";
+			}
+			return cleanPayload;
+		}
+		return payload;
 	}
 
 	private Handler<RoutingContext> routeGetRequest(final Supplier<RestEndpointRegistration> registrationSupplier)

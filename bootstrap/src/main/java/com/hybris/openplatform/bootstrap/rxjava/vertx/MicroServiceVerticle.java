@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -200,12 +201,22 @@ public abstract class MicroServiceVerticle extends AbstractVerticle
 		router.get(resourcePath).consumes(expectedContentType).handler(routingContextHandler);
 	}
 
+	protected void registerGetRequest(final String resourcePath, final Handler<RoutingContext> routingContextHandler)
+	{
+		router.get(resourcePath).handler(routingContextHandler);
+	}
+
 	protected void registerPostRequestWithCors(final RestEndpointRegistration restEndpointRegistration,
 			final Handler<RoutingContext> routingContextHandler)
 	{
 		addCorsHandlerIfAllowed(HttpMethod.POST, restEndpointRegistration.getAccessControlAllowOrigin());
 		router.post(restEndpointRegistration.getPattern()).consumes(restEndpointRegistration.getAcceptedContentType())
 				.handler(routingContextHandler);
+	}
+
+	protected void registerPostRequest(final String resourcePath, final String acceptedContentType, final Handler<RoutingContext> routingContextHandler)
+	{
+		router.post(resourcePath).consumes(acceptedContentType).handler(routingContextHandler);
 	}
 
 	protected void registerPostRequest(final RestEndpointRegistration restEndpointRegistration,
@@ -231,8 +242,10 @@ public abstract class MicroServiceVerticle extends AbstractVerticle
 			corsHandler = CorsHandler.create(allowedOriginPattern)
 					.allowedMethod(httpMethod)
 					.allowedMethod(HttpMethod.OPTIONS)
-					.allowedHeader("X-PINGARUNER")
-					.allowedHeader("Content-Type");
+					.allowedMethod(HttpMethod.PATCH)
+					.allowedHeaders(ImmutableSet.of("X-PINGARUNER", "Content-Type", "tenant", "Accept"))
+					.exposedHeaders(ImmutableSet.of("Hybris-Cart-Items", "Hybis-Cart-SubTotal", "tenant", "Location"));
+
 			router.route().handler(corsHandler);
 		}
 	}

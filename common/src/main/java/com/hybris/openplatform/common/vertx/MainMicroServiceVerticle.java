@@ -14,11 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.net.JksOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.CookieHandler;
 import io.vertx.ext.web.handler.SessionHandler;
@@ -30,6 +33,7 @@ import io.vertx.ext.web.sstore.LocalSessionStore;
 @Profile("no-rx-vertx")
 public class MainMicroServiceVerticle extends MicroServiceVerticle implements CompositionVerticle
 {
+	private static final Logger LOG = LoggerFactory.getLogger(MainMicroServiceVerticle.class);
 	private static final String HOST_NAME = "localhost";
 
 	@Value("${vertx.http.port:0}")
@@ -40,8 +44,7 @@ public class MainMicroServiceVerticle extends MicroServiceVerticle implements Co
 	private VerticleDeployer verticleDeploymentService;
 
 	private HttpServer httpServer;
-
-	private static final Logger LOG = LoggerFactory.getLogger(MainMicroServiceVerticle.class);
+	private Environment env;
 
 	@Override
 	public void start(final Future<Void> future) throws Exception
@@ -51,7 +54,19 @@ public class MainMicroServiceVerticle extends MicroServiceVerticle implements Co
 
 		mainRouter.get("/openplatform").handler(rc -> rc.response().end("Openplatform is alive"));
 
-		httpServer = getVertx().createHttpServer()
+		final HttpServerOptions httpOpts = new HttpServerOptions();
+		// Use a Java Keystore File
+		final String certPath = env.getProperty("server.certificate_path", "");
+		if (certPath.toLowerCase().endsWith("jks"))
+		{
+			httpOpts.setKeyStoreOptions(new JksOptions()
+					.setPassword("password")
+					.setPath(certPath));
+			LOG.info("Setting up SSL for HTTP");
+			httpOpts.setSsl(true);
+		}
+
+		httpServer = getVertx().createHttpServer(httpOpts)
 				.requestHandler(mainRouter::accept)
 				.listen(vertxPort, ar -> {
 					if (ar.succeeded())
@@ -127,5 +142,11 @@ public class MainMicroServiceVerticle extends MicroServiceVerticle implements Co
 	public void setVerticleDeploymentService(final VerticleDeployer verticleDeploymentService)
 	{
 		this.verticleDeploymentService = verticleDeploymentService;
+	}
+
+	@Resource
+	public void setEnv(final Environment env)
+	{
+		this.env = env;
 	}
 }

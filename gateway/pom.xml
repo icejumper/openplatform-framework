@@ -4,26 +4,59 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>gateway</artifactId>
+	<artifactId>zeppelins-gateway</artifactId>
 
 	<properties>
 		<docker.image.prefix>ptinfrak8s.azurecr.io</docker.image.prefix>
 	</properties>
 
 	<parent>
-		<artifactId>common-framework</artifactId>
+		<artifactId>zeppelins-common-framework</artifactId>
 		<groupId>com.hybris.openplatform</groupId>
 		<version>0.1</version>
 	</parent>
-	
+
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>certificates/openplatform_trusted.jks</exclude>
+				</excludes>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>certificates/openplatform_trusted.jks</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<skip>false</skip>
+					<artifactItems>
+						<artifactItem>
+							<groupId>com.hybris.openplatform</groupId>
+							<artifactId>zeppelins-common</artifactId>
+							<version>0.1</version>
+							<type>jar</type>
+							<overWrite>false</overWrite>
+							<outputDirectory>${project.build.directory}/mutablelibs</outputDirectory>
+						</artifactItem>
+						<artifactItem>
+							<groupId>com.hybris.openplatform</groupId>
+							<artifactId>zeppelins-bootstrap</artifactId>
+							<version>0.1</version>
+							<type>jar</type>
+							<overWrite>false</overWrite>
+							<outputDirectory>${project.build.directory}/mutablelibs</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.spotify</groupId>
@@ -31,8 +64,6 @@
 				<version>1.3.7</version>
 				<configuration>
 					<repository>${docker.image.prefix}/${project.artifactId}</repository>
-					<serverId>${docker.image.prefix}</serverId>
-					<registryUrl>https://${docker.image.prefix}</registryUrl>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -57,18 +88,38 @@
 							<build>
 								<from>openjdk:8-jre-alpine</from>
 								<assembly>
-									<basedir>/opt/</basedir>
+									<basedir>/opt</basedir>
 									<descriptorRef>artifact</descriptorRef>
+									<inline>
+										<fileSets>
+											<fileSet>
+												<directory>target/libs</directory>
+												<outputDirectory>/libs</outputDirectory>
+											</fileSet>
+											<fileSet>
+												<directory>target/mutablelibs</directory>
+												<outputDirectory>/mutablelibs</outputDirectory>
+											</fileSet>
+										</fileSets>
+										<files>
+											<file>
+												<source>target/classes/scripts/run.sh</source>
+												<outputDirectory>/</outputDirectory>
+											</file>
+										</files>
+									</inline>
 								</assembly>
+								<runCmds>
+									<run>chmod +x /opt/run.sh</run>
+								</runCmds>
 								<env>
 									<HTTP_PORT>8085</HTTP_PORT>
-									<JAVA_APP_JAR>${project.artifactId}-${project.version}.jar</JAVA_APP_JAR>
 								</env>
 								<ports>
 									<port>8085</port>
 								</ports>
 								<cmd>
-									<shell>exec java -Dspring.profiles.active=kubernetes -jar /opt/${project.artifactId}-${project.version}.jar</shell>
+									<shell>/opt/run.sh</shell>
 								</cmd>
 							</build>
 						</image>
@@ -81,7 +132,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.hybris.openplatform</groupId>
-			<artifactId>openplatform-common</artifactId>
+			<artifactId>zeppelins-common</artifactId>
 			<version>0.1</version>
 		</dependency>
 		<dependency>

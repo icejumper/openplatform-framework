@@ -70,7 +70,8 @@ public abstract class MicroServiceVerticle extends AbstractVerticle
 
 	protected abstract void registerVerticleEndPoints();
 
-	protected void registerService(final RestEndpointRegistration registration, final AsyncRegistrationHandlerProvider registrationHandlerProvider)
+	protected void registerService(final RestEndpointRegistration registration,
+			final AsyncRegistrationHandlerProvider registrationHandlerProvider)
 	{
 		sendMessage(MessageAddresses.REGISTER_REST_END_POINT, Json.encode(registration),
 				registrationHandlerProvider.handle(super.vertx, registration));

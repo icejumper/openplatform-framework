@@ -1,3 +1,7 @@
+server:
+  ssl_enabled: true
+  certificate_path: /opt/security/openplatform_trusted.jks
+---
 vertx:
   microservice:
     name: openplatform-api-gateway
@@ -32,4 +36,9 @@ storage:
       enabled: true
       write-batch-size: 10
       write-delay-seconds: 5
+---
+resources:
+   security:
+      cors:
+         allowOriginPattern: '*'
 ---
