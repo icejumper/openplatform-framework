@@ -9,6 +9,13 @@ Springboot-based framework, designed to build microservices. Depends on Springbo
 - <i>cd gateway</i>
 - execute <i>./runservice.sh</i>
 
+# Building docker image for zeppelins-gateway
+
+- make sure you run the docker machine (e.g. issue <i>docker-machine start</i> if you did not do so)
+- run <i>eval $(docker-machine env)</i> to make sure you have the correct docker virtual machine environment variables
+- run <i>mvn docker:build</i>. After the task finishes, you should see the image <i>myresource.azurecr.io/zeppelins-gateway:latest</i> in the docker images list (<i>docker images</i>)
+- test, if the image runs correctly (e.g. by running <i>docker run -it myresource.azurecr.io/zeppelins-gateway:latest /bin/sh</i>)
+
 # Introduction
 
 The zeppelins openplatform framework helps creating the reactive microservices, based on

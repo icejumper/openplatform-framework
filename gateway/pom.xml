@@ -7,7 +7,7 @@
 	<artifactId>zeppelins-gateway</artifactId>
 
 	<properties>
-		<docker.image.prefix>ptinfrak8s.azurecr.io</docker.image.prefix>
+		<docker.image.prefix>myresource.azurecr.io</docker.image.prefix>
 	</properties>
 
 	<parent>
@@ -83,8 +83,8 @@
 					<registry>${docker.image.prefix}</registry>
 					<images>
 						<image>
-							<name>openplatform-gateway:1.0.0</name>
-							<alias>openplatform-gateway</alias>
+							<name>zeppelins-gateway:0.1.0</name>
+							<alias>zeppelins-gateway</alias>
 							<build>
 								<from>openjdk:8-jre-alpine</from>
 								<assembly>
