@@ -8,6 +8,7 @@
 
 	<properties>
 		<docker.image.prefix>myresource.azurecr.io</docker.image.prefix>
+		<orchestrator-profile>default</orchestrator-profile>
 	</properties>
 
 	<parent>
@@ -15,6 +16,21 @@
 		<groupId>com.hybris.openplatform</groupId>
 		<version>0.1</version>
 	</parent>
+
+	<profiles>
+		<profile>
+			<id>kubernetes</id>
+			<activation>
+				<property>
+					<name>k8s-cluster</name>
+					<value>kubernetes</value>
+				</property>
+			</activation>
+			<properties>
+				<orchestrator-profile>kubernetes</orchestrator-profile>
+			</properties>
+		</profile>
+	</profiles>
 
 	<build>
 		<resources>
@@ -106,6 +122,10 @@
 												<source>target/classes/scripts/run.sh</source>
 												<outputDirectory>/</outputDirectory>
 											</file>
+											<file>
+												<source>target/zeppelins-gateway-0.1.jar</source>
+												<outputDirectory>/</outputDirectory>
+											</file>
 										</files>
 									</inline>
 								</assembly>
@@ -118,9 +138,9 @@
 								<ports>
 									<port>8085</port>
 								</ports>
-								<cmd>
-									<shell>/opt/run.sh</shell>
-								</cmd>
+								<entryPoint>
+									<shell>/bin/sh /opt/run.sh</shell>
+								</entryPoint>
 							</build>
 						</image>
 					</images>
